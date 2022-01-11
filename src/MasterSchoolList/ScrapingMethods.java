@@ -21,7 +21,7 @@ public final class ScrapingMethods {
     public static void startDriver(){
         // Disable image loading
         ChromeOptions options =new ChromeOptions();
-        Map<String, Object> prefs = new HashMap<String, Object>();
+        Map<String, Object> prefs = new HashMap<>();
         prefs.put("profile.managed_default_content_settings.images", 2);
         options.setExperimentalOption("prefs", prefs);
 
@@ -73,9 +73,8 @@ public final class ScrapingMethods {
     public static List<String> getAllLinkHrefs(Elements elements) {
         List<String> hrefList = new ArrayList<>();
         for(Element element : elements.select("a")) {
-            hrefList.add(element.attr("href"));
 //            if(element.hasText()) {
-//                hrefList.add(element.attr("href"));
+                hrefList.add(element.attr("href"));
 //            } else {
 //                System.out.println("no text");
 //            }
@@ -86,11 +85,11 @@ public final class ScrapingMethods {
     public static List<String> getAllLinkTexts(Elements elements) {
         List<String> linkTextList = new ArrayList<>();
         for(Element element : elements.select("a")) {
-            if (element.hasAttr("href")) {
+//            if (element.hasAttr("href")) {
                 linkTextList.add(element.text());
-            } else {
-                System.out.println("no href");
-            }
+//            } else {
+//                System.out.println("no href");
+//            }
         }
         return linkTextList;
     }
