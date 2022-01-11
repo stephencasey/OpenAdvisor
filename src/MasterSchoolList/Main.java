@@ -19,16 +19,5 @@ public class Main {
 
         ScrapingMethods.closeDriver();
 
-
-
-//        site4icu.setExtractionMethod(www4icuExtractor);
-//
-//        UrlMasterListSite siteTheedadvocate = new UrlMasterListSite("https://www.theedadvocate.org/an-a-z-list-of-u-s-colleges-and-universities/");
-//        ExtractsColleges theedadvocateExtractor = new ExtractFromSubPages();
-//
-
-
-
-
     }
 }
