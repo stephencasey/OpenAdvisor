@@ -4,6 +4,7 @@ import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ExtractFrom4icuMethod extends ExtractionProcess {
     private List<String> schoolNames;
@@ -15,7 +16,7 @@ public class ExtractFrom4icuMethod extends ExtractionProcess {
     }
 
     @Override
-    public void scrapeUrlList(String mainUrl) {
+    public Map<String, String> scrapeUrlList(String mainUrl) {
         Elements rows = ScrapingMethods.getRowsOfLargestTable(mainUrl);
         schoolNames = new ArrayList<>(ScrapingMethods.getAllLinkTexts(rows));
         subDomains = new ArrayList<>(ScrapingMethods.getAllLinkHrefs(rows));
@@ -23,6 +24,7 @@ public class ExtractFrom4icuMethod extends ExtractionProcess {
 
         getSchoolUrlsFromSubDirectories();
         printScrapingResults();
+        return urlToSchool;
     }
 
     private void getSchoolUrlsFromSubDirectories() {
@@ -68,9 +70,6 @@ public class ExtractFrom4icuMethod extends ExtractionProcess {
     }
     
     private boolean endsInDotEdu(String url){
-        if(url.replaceAll("/$", "").endsWith(".edu")){
-            return true;
-        }
-        return false;
+        return url.replaceAll("/$", "").endsWith(".edu");
     }
 }

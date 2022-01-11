@@ -5,17 +5,9 @@ import java.util.Map;
 public class UrlMasterListSite {
     private String mainUrl;
     private ExtractionProcess extractionProcess;
-    private Map<String, String> schoolToUrl;
+    private Map<String, String> urlToSchool;
 
     public UrlMasterListSite(String mainUrl) {
-        this.mainUrl = mainUrl;
-    }
-
-    public String getMainUrl() {
-        return mainUrl;
-    }
-
-    public void setMainUrl(String mainUrl) {
         this.mainUrl = mainUrl;
     }
 
@@ -24,10 +16,10 @@ public class UrlMasterListSite {
     }
 
     public void scrapeUrls(){
-        extractionProcess.scrapeUrlList(mainUrl);
+        urlToSchool = extractionProcess.scrapeUrlList(mainUrl);
     }
 
-    public Map<String, String> getSchoolToUrl() {
-        return schoolToUrl;
+    public Map<String, String> getUrlToSchool() {
+        return urlToSchool;
     }
 }

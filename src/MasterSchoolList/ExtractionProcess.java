@@ -10,7 +10,7 @@ public abstract class ExtractionProcess {
         urlToSchool = new HashMap<>();
     }
 
-    public abstract void scrapeUrlList(String mainUrl);
+    public abstract Map<String, String> scrapeUrlList(String mainUrl);
 
     public void printScrapingResults(){
         for(Map.Entry<String, String> entry : urlToSchool.entrySet()) {

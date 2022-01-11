@@ -4,6 +4,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
+import java.util.Map;
 
 public class ExtractFromHtmlTable extends ExtractionProcess {
     private final int SCHOOL_COLUMN;
@@ -16,10 +17,11 @@ public class ExtractFromHtmlTable extends ExtractionProcess {
     }
 
     @Override
-    public void scrapeUrlList(String mainUrl) {
+    public Map<String, String> scrapeUrlList(String mainUrl) {
         Elements tableRows = ScrapingMethods.getRowsOfLargestTable(mainUrl);
         extractSchoolsAndUrlsFromTable(tableRows);
         printScrapingResults();
+        return urlToSchool;
     }
 
     private void extractSchoolsAndUrlsFromTable(Elements tableRows){

@@ -19,5 +19,11 @@ public class Main {
 
         ScrapingMethods.closeDriver();
 
+        Schools schools = new Schools();
+        schools.addSchools(siteTheedadvocate.getUrlToSchool());
+        schools.addSchools(site4icu.getUrlToSchool());
+
+        System.out.println(schools.getSchoolList().size() +" schools saved");
+
     }
 }
