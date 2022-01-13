@@ -13,9 +13,6 @@ public abstract class ExtractionProcess {
     public abstract Map<String, String> scrapeUrlList(String mainUrl);
 
     public void printScrapingResults(){
-        for(Map.Entry<String, String> entry : urlToSchool.entrySet()) {
-            System.out.println(entry.getKey() + " | " + entry.getValue());
-        }
         System.out.println("\n" + urlToSchool.size() + " schools were collected.");
     }
 

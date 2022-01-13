@@ -1,5 +1,7 @@
 package MasterSchoolList;
 
+import common.ScrapingMethods;
+
 import java.util.Arrays;
 
 public class Main {
@@ -23,7 +25,8 @@ public class Main {
         schools.addSchools(siteTheedadvocate.getUrlToSchool());
         schools.addSchools(site4icu.getUrlToSchool());
 
-        System.out.println(schools.getSchoolList().size() +" schools saved");
+        schools.exportSchoolsToPostgres();
+
 
     }
 }

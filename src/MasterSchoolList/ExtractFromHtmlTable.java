@@ -1,5 +1,6 @@
 package MasterSchoolList;
 
+import common.ScrapingMethods;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 

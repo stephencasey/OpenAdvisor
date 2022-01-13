@@ -1,9 +1,8 @@
 package MasterSchoolList;
 
-import org.apache.commons.exec.util.StringUtils;
+import common.PostgreSQL;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.sql.ResultSet;
 import java.util.*;
 
 public class Schools {
@@ -13,18 +12,33 @@ public class Schools {
         schoolList = new ArrayList<>();
     }
 
-    public List<School> getSchoolList() {
-        return schoolList;
+    public void exportSchoolsToPostgres(){
+        PostgreSQL app = new PostgreSQL();
+        app.createDb();
+        app.connect();
+        app.executeUpdate("CREATE TABLE IF NOT EXISTS schools" +
+                "(name varchar(100), domain varchar(50) UNIQUE, catalog_type varchar(20))");
+
+        for(School school : schoolList){
+            app.executeUpdate("INSERT INTO schools(name, domain) " +
+                    "VALUES($$"+ school.getSchoolName() +"$$,'" + school.getDomain() + "');");
+        }
+        ResultSet countResultSet = app.executeQuery("SELECT COUNT(*) FROM schools;");
+        System.out.println("Number of schools saved to psql:");
+        app.printResultSet(countResultSet);
+        app.close();
+
     }
 
     public void addSchools(Map<String, String> urlToSchool) {
         for(Map.Entry<String, String> entry : urlToSchool.entrySet()) {
             String url = entry.getKey();
-            String schoolName = entry.getValue().toUpperCase();
-            String domain = getDomain(url).toLowerCase();
+            String schoolName = entry.getValue().toUpperCase().strip();
+            String domain = getDomain(url).toLowerCase().strip();
             if (!schoolExists(domain)) {
                 schoolList.add(new School(schoolName, domain));
             }
+            Collections.sort(schoolList);
         }
     }
 
@@ -37,10 +51,13 @@ public class Schools {
         return false;
     }
 
-
     private static String getDomain(String url) {
-        URI uri = URI.create(url);
-        String domain = uri.getHost();
-        return domain.startsWith("www.") ? domain.substring(4) : domain;
+        return url.replaceFirst("^https?://(www[.])?", "");
+    }
+
+    public void printSchools(){
+        for(School school : schoolList){
+            System.out.println(school.getDomain() + " | " + school.getSchoolName());
+        }
     }
 }

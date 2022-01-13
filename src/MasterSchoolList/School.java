@@ -1,6 +1,6 @@
 package MasterSchoolList;
 
-public class School {
+public class School implements Comparable<School>{
     private String schoolName;
     private String domain;
 
@@ -17,4 +17,8 @@ public class School {
         return domain;
     }
 
+    @Override
+    public int compareTo(School otherSchool) {
+        return schoolName.compareTo(otherSchool.schoolName);
+    }
 }

@@ -1,4 +1,4 @@
-package MasterSchoolList;
+package common;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -26,9 +26,9 @@ public final class ScrapingMethods {
         options.setExperimentalOption("prefs", prefs);
 
         driver = new ChromeDriver(options);
-        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
-        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(10));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().scriptTimeout(Duration.ofSeconds(30));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(30));
     }
 
     public static String extractPageHtml(String url){
@@ -73,11 +73,7 @@ public final class ScrapingMethods {
     public static List<String> getAllLinkHrefs(Elements elements) {
         List<String> hrefList = new ArrayList<>();
         for(Element element : elements.select("a")) {
-//            if(element.hasText()) {
                 hrefList.add(element.attr("href"));
-//            } else {
-//                System.out.println("no text");
-//            }
         }
         return hrefList;
     }
@@ -85,11 +81,7 @@ public final class ScrapingMethods {
     public static List<String> getAllLinkTexts(Elements elements) {
         List<String> linkTextList = new ArrayList<>();
         for(Element element : elements.select("a")) {
-//            if (element.hasAttr("href")) {
                 linkTextList.add(element.text());
-//            } else {
-//                System.out.println("no href");
-//            }
         }
         return linkTextList;
     }
