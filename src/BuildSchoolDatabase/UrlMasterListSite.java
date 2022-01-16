@@ -1,22 +1,22 @@
-package MasterSchoolList;
+package BuildSchoolDatabase;
 
 import java.util.Map;
 
 public class UrlMasterListSite {
     private String mainUrl;
-    private ExtractionProcess extractionProcess;
+    private SchoolExtractor schoolExtractor;
     private Map<String, String> urlToSchool;
 
     public UrlMasterListSite(String mainUrl) {
         this.mainUrl = mainUrl;
     }
 
-    public void setExtractionProcess(ExtractionProcess extractionProcess){
-        this.extractionProcess = extractionProcess;
+    public void setExtractionProcess(SchoolExtractor schoolExtractor){
+        this.schoolExtractor = schoolExtractor;
     }
 
     public void scrapeUrls(){
-        urlToSchool = extractionProcess.scrapeUrlList(mainUrl);
+        urlToSchool = schoolExtractor.scrapeUrlList(mainUrl);
     }
 
     public Map<String, String> getUrlToSchool() {

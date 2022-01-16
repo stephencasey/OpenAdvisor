@@ -1,6 +1,7 @@
-package MasterSchoolList;
+package BuildSchoolDatabase;
 
-import common.ScrapingMethods;
+import common.Schools;
+import common.WebScraper;
 
 import java.util.Arrays;
 
@@ -11,22 +12,22 @@ public class Main {
         UrlMasterListSite siteTheedadvocate = new UrlMasterListSite("https://www.theedadvocate.org/an-a-z-list-of-u-s-colleges-and-universities/");
         UrlMasterListSite site4icu = new UrlMasterListSite("https://www.4icu.org/us/a-z/");
 
-        siteTheedadvocate.setExtractionProcess(new ExtractFromHtmlTable(Arrays.asList("school", "url", "state")));
-        site4icu.setExtractionProcess(new ExtractFrom4icuMethod());
+        WebScraper scraper = new WebScraper();
 
-        ScrapingMethods.startDriver();
+        siteTheedadvocate.setExtractionProcess(new ExtractFromHtmlTable(scraper, Arrays.asList("school", "url", "state")));
+        site4icu.setExtractionProcess(new ExtractFrom4icuMethod(scraper));
 
+        scraper.startDriver();
         siteTheedadvocate.scrapeUrls();
         site4icu.scrapeUrls();
-
-        ScrapingMethods.closeDriver();
+        scraper.closeDriver();
 
         Schools schools = new Schools();
         schools.addSchools(siteTheedadvocate.getUrlToSchool());
         schools.addSchools(site4icu.getUrlToSchool());
 
+        CatalogType.setCatalogTypes(schools);
+
         schools.exportSchoolsToPostgres();
-
-
     }
 }

@@ -1,26 +1,27 @@
-package MasterSchoolList;
+package BuildSchoolDatabase;
 
-import common.ScrapingMethods;
+import common.WebScraper;
 import org.jsoup.select.Elements;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ExtractFrom4icuMethod extends ExtractionProcess {
+public class ExtractFrom4icuMethod extends SchoolExtractor {
     private List<String> schoolNames;
     private List<String> subDomains;
     private String domain;
 
-    public ExtractFrom4icuMethod() {
-        super();
+    public ExtractFrom4icuMethod(WebScraper scraper) {
+        super(scraper);
     }
 
     @Override
     public Map<String, String> scrapeUrlList(String mainUrl) {
-        Elements rows = ScrapingMethods.getRowsOfLargestTable(mainUrl);
-        schoolNames = new ArrayList<>(ScrapingMethods.getAllLinkTexts(rows));
-        subDomains = new ArrayList<>(ScrapingMethods.getAllLinkHrefs(rows));
+        scraper.loadPage(mainUrl);
+        Elements rows = scraper.getRowsOfLargestTable();
+        schoolNames = new ArrayList<>(WebScraper.getAllLinkTexts(rows));
+        subDomains = new ArrayList<>(WebScraper.getAllLinkHrefs(rows));
         domain = mainUrl.substring(0,20);
 
         getSchoolUrlsFromSubDirectories();
@@ -55,8 +56,9 @@ public class ExtractFrom4icuMethod extends ExtractionProcess {
 
     private List<String> getDotEduUrls(String subDomain){
         String subpageUrl = domain + subDomain;
-        Elements tables = ScrapingMethods.getTables(subpageUrl);
-        List<String> candidateUrls = ScrapingMethods.getAllLinkHrefs(tables);
+        scraper.loadPage(subpageUrl);
+        Elements tables = scraper.getTables();
+        List<String> candidateUrls = WebScraper.getAllLinkHrefs(tables);
         return filterDotEduUrls(candidateUrls);
     }
 

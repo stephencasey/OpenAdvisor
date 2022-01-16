@@ -1,25 +1,26 @@
-package MasterSchoolList;
+package BuildSchoolDatabase;
 
-import common.ScrapingMethods;
+import common.WebScraper;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.util.List;
 import java.util.Map;
 
-public class ExtractFromHtmlTable extends ExtractionProcess {
+public class ExtractFromHtmlTable extends SchoolExtractor {
     private final int SCHOOL_COLUMN;
     private final int URL_COLUMN;
 
-    public ExtractFromHtmlTable(List<String> columnNames) {
-        super();
+    public ExtractFromHtmlTable(WebScraper scraper, List<String> columnNames) {
+        super(scraper);
         SCHOOL_COLUMN = columnNames.indexOf("school");
         URL_COLUMN = columnNames.indexOf("url");
     }
 
     @Override
     public Map<String, String> scrapeUrlList(String mainUrl) {
-        Elements tableRows = ScrapingMethods.getRowsOfLargestTable(mainUrl);
+        scraper.loadPage(mainUrl);
+        Elements tableRows = scraper.getRowsOfLargestTable();
         extractSchoolsAndUrlsFromTable(tableRows);
         printScrapingResults();
         return urlToSchool;

@@ -4,8 +4,8 @@ import javax.xml.transform.Result;
 import java.sql.*;
 
 public class PostgreSQL {
-    private final String user = System.getenv("PG_USER");
-    private final String password = System.getenv("PG_PASSWORD");
+    private static final String user = System.getenv("PG_USER");
+    private static final String password = System.getenv("PG_PASSWORD");
     private Statement stmt;
 
     public Connection connect() {
@@ -55,7 +55,6 @@ public class PostgreSQL {
         return resultSet;
     }
 
-
     public void printResultSet(ResultSet resultSet){
         try {
             ResultSetMetaData rsmd = resultSet.getMetaData();
@@ -66,7 +65,7 @@ public class PostgreSQL {
                     String columnValue = resultSet.getString(i);
                     System.out.print(columnValue + " " + rsmd.getColumnName(i));
                 }
-                System.out.println("");
+                System.out.println();
             }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
@@ -76,25 +75,6 @@ public class PostgreSQL {
     public void executeUpdate(String query) {
         try {
             stmt.executeUpdate(query);
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    public void getDatabaseMetadata(){
-        try {
-            DatabaseMetaData metadata = stmt.getConnection().getMetaData();
-            ResultSet columns = metadata.getColumns(null,null, "schools", null);
-            while(columns.next())
-            {
-                String columnName = columns.getString("COLUMN_NAME");
-                String datatype = columns.getString("DATA_TYPE");
-                String columnsize = columns.getString("COLUMN_SIZE");
-                String decimaldigits = columns.getString("DECIMAL_DIGITS");
-                String isNullable = columns.getString("IS_NULLABLE");
-                String is_autoIncrment = columns.getString("IS_AUTOINCREMENT");
-                System.out.println(columnName + "---" + datatype + "---" + columnsize + "---" + decimaldigits + "---" + isNullable + "---" + is_autoIncrment);
-            }
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
