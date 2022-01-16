@@ -15,7 +15,7 @@ public class CourseExtractorCourseleaf extends CourseExtractor{
     }
 
     @Override
-    public Set<String> extractCourseBlocksFromUrls(Set<String> candidateUrls) {
+    protected Set<String> extractCourseBlocksFromUrls(Set<String> candidateUrls) {
         Set<String> schoolCourseBlocks = new HashSet<>();
         int levelsDeep = 1;
         while(schoolCourseBlocks.isEmpty() && levelsDeep <= 2) {

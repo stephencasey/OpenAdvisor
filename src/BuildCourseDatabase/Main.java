@@ -6,10 +6,7 @@ import common.WebScraper;
 
 public class Main {
     public static void main(String[] args) {
-        PostgreSQL postgres = new PostgreSQL();
-        postgres.connect();
-        postgres.executeUpdate("DROP TABLE IF EXISTS courses;");
-        postgres.close();
+        PostgreSQL.deleteTable("courses");
 
         Schools schoolsAcalog = new Schools();
         schoolsAcalog.importSchoolsFromPostgres("acalog");

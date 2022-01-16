@@ -42,9 +42,9 @@ public abstract class CourseExtractor {
         }
     }
 
-    public abstract Set<String> extractCourseBlocksFromUrls(Set<String> urls);
+    protected abstract Set<String> extractCourseBlocksFromUrls(Set<String> urls);
 
-    public Set<String> getCandidateCourseDirectoryUrls(String domain) {
+    private Set<String> getCandidateCourseDirectoryUrls(String domain) {
         String mainUrl = "http://" + domain;
         Elements linksOnMainPage = scrapeInDomainPageLinks(mainUrl, domain);
         Set<String> candidateUrls = getUrlsWithCourseInTitle(linksOnMainPage);
@@ -81,13 +81,13 @@ public abstract class CourseExtractor {
         return candidateUrls;
     }
 
-    protected Set<String> getUniqueUrls(Elements links) {
+    private Set<String> getUniqueUrls(Elements links) {
         Set<String> urls = new HashSet<>();
         links.forEach(link -> urls.add(link.absUrl("href")));
         return urls;
     }
 
-    protected void writeSchoolCompleted(School school) {
+    private void writeSchoolCompleted(School school) {
         try (java.io.PrintWriter output = new PrintWriter(new FileWriter("schools_completed.txt", true), true)) {
             output.println(school.getID());
         } catch (IOException ex) {
@@ -95,7 +95,7 @@ public abstract class CourseExtractor {
         }
     }
 
-    protected boolean isCompleted(School school) {
+    private boolean isCompleted(School school) {
         java.io.File file = new java.io.File("schools_completed.txt");
         try {
             Scanner input = new Scanner(file);

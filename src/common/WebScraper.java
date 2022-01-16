@@ -8,8 +8,6 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.time.Duration;
 import java.util.*;
 
@@ -20,12 +18,10 @@ public class WebScraper {
     // Selenium Methods
 
     public void startDriver(){
-        // Disable image loading
         ChromeOptions options =new ChromeOptions();
         Map<String, Object> prefs = new HashMap<>();
-        prefs.put("profile.managed_default_content_settings.images", 2);
+        prefs.put("profile.managed_default_content_settings.images", 2);    // Disable image loading
         options.setExperimentalOption("prefs", prefs);
-
 
         driver = new ChromeDriver(options);
 
@@ -56,22 +52,12 @@ public class WebScraper {
         return driver.findElements(By.xpath(xpath));
     }
 
-    public List<WebElement> getElementsByClassName(String className) {
-        return driver.findElements(By.className(className));
-    }
-
     public void scrollToMiddleOfWebElement(WebElement webElement) {
         String scrollToMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, " +
                 "window.innerHeight || 0);var elementTop = arguments[0].getBoundingClientRect()." +
                 "top;window.scrollBy(0, elementTop-(4*viewPortHeight/5));";
         driver.executeScript(scrollToMiddle, webElement);
     }
-
-    public static void removeNonDomainLinks(String domain, Set<String> links){
-        links.removeIf(Objects::isNull);
-        links.removeIf(link -> !link.contains(domain));
-    }
-
 
 
 
@@ -111,7 +97,6 @@ public class WebScraper {
         return getTableRows(largestTable);
     }
 
-
     public Elements getInDomainPageLinks(String url, String domain) {
         String baseUri = "http://" + domain;
         loadPage(url, baseUri);
@@ -133,22 +118,10 @@ public class WebScraper {
         return linkTextList;
     }
 
-
     public static Elements getTableRows(Element table){
         if(table == null){
             return null;
         }
         return table.select("tr");
-    }
-
-    public static String getDomain(String baseUri) {
-        String hostname = "";
-        try {
-            URI uri = new URI(baseUri);
-            hostname = uri.getHost();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return hostname.startsWith("www.") ? hostname.substring(4) : hostname;
     }
 }

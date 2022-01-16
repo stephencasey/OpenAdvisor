@@ -18,7 +18,7 @@ public class CatalogType {
         scraper.closeDriver();
     }
 
-    public static String extractCatalogType(School school) {
+    private static String extractCatalogType(School school) {
         String domain = school.getDomain();
         String html;
         try {

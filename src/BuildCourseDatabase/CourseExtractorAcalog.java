@@ -17,7 +17,7 @@ public class CourseExtractorAcalog extends CourseExtractor {
     }
 
     @Override
-    public Set<String> extractCourseBlocksFromUrls(Set<String> candidateUrls){
+    protected Set<String> extractCourseBlocksFromUrls(Set<String> candidateUrls){
         Set<String> schoolCourseBlocks = new HashSet<>();
 
         for(String candidateUrl : candidateUrls) {

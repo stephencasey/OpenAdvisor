@@ -1,6 +1,5 @@
 package common;
 
-import javax.xml.transform.Result;
 import java.sql.*;
 
 public class PostgreSQL {
@@ -8,26 +7,10 @@ public class PostgreSQL {
     private static final String password = System.getenv("PG_PASSWORD");
     private Statement stmt;
 
-    public Connection connect() {
-        final String url = "jdbc:postgresql://localhost/openadvisor";
-
-        Connection connection = null;
-        try {
-            connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-            stmt = connection.createStatement();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return connection;
-    }
-
     public void createDb() {
         final String url = "jdbc:postgresql://localhost/";
         try {
-            Connection connection = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully.");
-            stmt = connection.createStatement();
+            connectAndCreateStmt(url);
             executeUpdate("DROP DATABASE openadvisor");
             executeUpdate("CREATE DATABASE openadvisor");
             close();
@@ -36,11 +19,25 @@ public class PostgreSQL {
         }
     }
 
+    private void connectAndCreateStmt(String url) throws SQLException {
+        Connection connection = DriverManager.getConnection(url, user, password);
+        stmt = connection.createStatement();
+    }
+    
+    public void connect() {
+        final String url = "jdbc:postgresql://localhost/openadvisor";
+        try {
+            connectAndCreateStmt(url);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void close() {
         try {
             stmt.close();
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -50,7 +47,7 @@ public class PostgreSQL {
             resultSet = stmt.executeQuery(query);
 
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
         return resultSet;
     }
@@ -68,7 +65,7 @@ public class PostgreSQL {
                 System.out.println();
             }
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -76,7 +73,15 @@ public class PostgreSQL {
         try {
             stmt.executeUpdate(query);
         } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
     }
+    
+    public static void deleteTable(String tableName) {
+        PostgreSQL postgres = new PostgreSQL();
+        postgres.connect();
+        postgres.executeUpdate("DROP TABLE IF EXISTS " + tableName + ";");
+        postgres.close();
+    }
+    
 }

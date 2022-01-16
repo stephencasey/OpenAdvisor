@@ -51,7 +51,6 @@ public class Schools implements Iterable<School>{
     public void importSchoolsFromPostgres(String catalog_type) {
         String query = catalog_type.isBlank() ? "SELECT * FROM schools" :
                 "SELECT * FROM schools WHERE catalog_type = '" + catalog_type + "';";
-
         try {
             PostgreSQL postgres = new PostgreSQL();
             postgres.connect();
@@ -83,17 +82,6 @@ public class Schools implements Iterable<School>{
 
     private static String getDomain(String url) {
         return url.replaceFirst("^https?://(www[.])?", "");
-    }
-
-
-    public void printSchools(){
-        for(School school : schoolList){
-            System.out.println(school.getDomain() + " | " + school.getSchoolName() + " | " + school.getCatalogType());
-        }
-    }
-
-    public List<School> getSchoolList() {
-        return schoolList;
     }
 
     @Override
