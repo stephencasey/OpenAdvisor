@@ -1,4 +1,5 @@
-# OA_CourseCollector
-Generates the master list of courses from 1700+ schools for OpenAdvisor
+# OpenAdvisor
+
+Generates a master list of 2500+ schools and 1,000,000+ course descriptions.
 
 Work in progress...
