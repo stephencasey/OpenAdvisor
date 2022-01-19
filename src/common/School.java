@@ -62,6 +62,10 @@ public class School implements Comparable<School>{
         postgres.close();
     }
 
+    public Set<String> getCourseBlocks() {
+        return courseBlocks;
+    }
+
     @Override
     public int compareTo(School otherSchool) {
         return schoolName.compareTo(otherSchool.schoolName);

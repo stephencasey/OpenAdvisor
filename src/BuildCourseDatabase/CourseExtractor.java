@@ -17,13 +17,16 @@ public abstract class CourseExtractor {
     protected Set<String> visitedSites;
     protected WebScraper scraper;
     protected String currentDomain;
+    protected long startTime;
 
-    public CourseExtractor(WebScraper scraper) {
+    public CourseExtractor() {
         visitedSites = new HashSet<>();
-        this.scraper = scraper;
+        startTime = System.currentTimeMillis();
     }
 
     public void extractCourseBlocksFromSchools(Schools schools) {
+        scraper = new WebScraper();
+        scraper.startDriver();
         for(School school : schools) {
             if(isCompleted(school)){
                 continue;
@@ -40,6 +43,7 @@ public abstract class CourseExtractor {
             school.setCourseBlocks(courseBlocks);
             writeSchoolCompleted(school);
         }
+        scraper.closeDriver();
     }
 
     protected abstract Set<String> extractCourseBlocksFromUrls(Set<String> urls);
@@ -90,6 +94,11 @@ public abstract class CourseExtractor {
     private void writeSchoolCompleted(School school) {
         try (java.io.PrintWriter output = new PrintWriter(new FileWriter("schools_completed.txt", true), true)) {
             output.println(school.getID());
+            System.out.print(school.getSchoolName() + " completed. ");
+            System.out.println("Number of courses: " + school.getCourseBlocks().size() + ". ");
+            long timeElapsed = System.currentTimeMillis()- startTime;
+            System.out.println("Time elapsed: " + timeElapsed/1000 + " seconds.");
+            startTime = System.currentTimeMillis();
         } catch (IOException ex) {
             ex.printStackTrace();
         }

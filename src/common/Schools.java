@@ -11,6 +11,12 @@ public class Schools implements Iterable<School>{
         schoolList = new ArrayList<>();
     }
 
+    public Schools(String catalogType) {
+        schoolList = new ArrayList<>();
+        importSchoolsFromPostgres(catalogType);
+    }
+
+
     public void addSchools(Map<String, String> urlToSchool) {
         for(Map.Entry<String, String> entry : urlToSchool.entrySet()) {
             String url = entry.getKey();

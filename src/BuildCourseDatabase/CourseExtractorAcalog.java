@@ -12,8 +12,8 @@ import java.util.concurrent.TimeUnit;
 
 public class CourseExtractorAcalog extends CourseExtractor {
 
-    public CourseExtractorAcalog(WebScraper scraper) {
-        super(scraper);
+    public CourseExtractorAcalog() {
+        super();
     }
 
     @Override

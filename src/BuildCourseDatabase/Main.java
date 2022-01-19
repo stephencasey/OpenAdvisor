@@ -6,21 +6,15 @@ import common.WebScraper;
 
 public class Main {
     public static void main(String[] args) {
-        PostgreSQL.deleteTable("courses");
 
-        Schools schoolsAcalog = new Schools();
-        schoolsAcalog.importSchoolsFromPostgres("acalog");
+        Schools schoolsAcalog = new Schools("acalog");
+        Schools schoolsCourseleaf = new Schools("courseleaf");
 
-        Schools schoolsCourseleaf = new Schools();
-        schoolsCourseleaf.importSchoolsFromPostgres("courseleaf");
-
-        WebScraper scraper = new WebScraper();
-        CourseExtractorCourseleaf courseExtractorCourseleaf = new CourseExtractorCourseleaf(scraper);
-        CourseExtractorAcalog courseExtractorAcalog = new CourseExtractorAcalog(scraper);
-
-        scraper.startDriver();
+        CourseExtractorAcalog courseExtractorAcalog = new CourseExtractorAcalog();
         courseExtractorAcalog.extractCourseBlocksFromSchools(schoolsAcalog);
+
+        CourseExtractorCourseleaf courseExtractorCourseleaf = new CourseExtractorCourseleaf();
         courseExtractorCourseleaf.extractCourseBlocksFromSchools(schoolsCourseleaf);
-        scraper.closeDriver();
+
     }
 }

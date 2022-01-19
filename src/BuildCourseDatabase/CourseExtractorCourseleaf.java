@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class CourseExtractorCourseleaf extends CourseExtractor{
 
-    public CourseExtractorCourseleaf(WebScraper scraper) {
-        super(scraper);
+    public CourseExtractorCourseleaf() {
+        super();
     }
 
     @Override
