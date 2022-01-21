@@ -5,12 +5,10 @@ import common.Schools;
 import common.WebScraper;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openqa.selenium.NoSuchWindowException;
 import org.openqa.selenium.WebDriverException;
 
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.*;
 
 public abstract class CourseExtractor {
@@ -25,23 +23,25 @@ public abstract class CourseExtractor {
     }
 
     public void extractCourseBlocksFromSchools(Schools schools) {
+        initializeFiles();
         scraper = new WebScraper();
         scraper.startDriver();
         for(School school : schools) {
-            if(isCompleted(school)){
+            if(isInFile(school, "schools_completed.txt") || isInFile(school, "schools_skipped.txt")){
                 continue;
             }
             currentDomain = "catalog." + school.getDomain();
             Set<String> candidateUrls = getCandidateCourseDirectoryUrls(currentDomain);
             candidateUrls.removeAll(visitedSites);
 
-            if (candidateUrls.isEmpty()) {
-                writeSchoolCompleted(school);
-                continue;
-            }
             Set<String> courseBlocks = extractCourseBlocksFromUrls(candidateUrls);
-            school.setCourseBlocks(courseBlocks);
-            writeSchoolCompleted(school);
+
+            if(courseBlocks.isEmpty()) {
+                writeSkipped(school);
+            } else {
+                school.setCourseBlocks(courseBlocks);
+                writeCompleted(school);
+            }
         }
         scraper.closeDriver();
     }
@@ -65,11 +65,14 @@ public abstract class CourseExtractor {
     protected Elements scrapeInDomainPageLinks(String url, String domain){
         Elements links;
         try {
-             links = scraper.getInDomainPageLinks(url, domain);
+            links = scraper.getInDomainPageLinks(url, domain);
             visitedSites.add(url);
             links.removeIf(link -> visitedSites.contains(link.absUrl("href")));
+        } catch (NoSuchWindowException ex) {
+            System.exit(1);
+            links = new Elements();
         } catch (WebDriverException ex) {
-//            logs.addMissedPage(subPageUrl);
+            ex.printStackTrace();
             links = new Elements();
         }
         return links;
@@ -91,26 +94,65 @@ public abstract class CourseExtractor {
         return urls;
     }
 
-    private void writeSchoolCompleted(School school) {
-        try (java.io.PrintWriter output = new PrintWriter(new FileWriter("schools_completed.txt", true), true)) {
-            output.println(school.getID());
-            System.out.print(school.getSchoolName() + " completed. ");
-            System.out.println("Number of courses: " + school.getCourseBlocks().size() + ". ");
-            long timeElapsed = System.currentTimeMillis()- startTime;
-            System.out.println("Time elapsed: " + timeElapsed/1000 + " seconds.");
-            startTime = System.currentTimeMillis();
+    private void writeSkipped(School school) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("schools_skipped.txt", true))) {
+            writer.write(String.valueOf(school.getID()));
+            writer.newLine();
+            System.out.print("Skipped " + school.getSchoolName()+ ".");
+            printTimeElapsed();
         } catch (IOException ex) {
             ex.printStackTrace();
         }
     }
 
-    private boolean isCompleted(School school) {
-        java.io.File file = new java.io.File("schools_completed.txt");
+    private void writeCompleted(School school) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("schools_completed.txt", true))) {
+            writer.write(String.valueOf(school.getID()));
+            writer.newLine();
+            removeFromSkipped(school);
+            System.out.print("Completed " + school.getSchoolName() + ".");
+            System.out.print("Number of courses: " + school.getCourseBlocks().size() + ". ");
+            printTimeElapsed();
+        } catch (IOException ex) {
+            writeSkipped(school);
+            ex.printStackTrace();
+        }
+    }
+
+    private void removeFromSkipped(School school) {
+        File tempFile = new File("temp.txt");
+        File schoolsSkippedFile = new File("schools_skipped.txt");
+
+        try(
+                BufferedReader skippedReader = new BufferedReader(new FileReader(schoolsSkippedFile));
+                BufferedWriter skippedWriter = new BufferedWriter(new FileWriter(tempFile))
+        ) {
+            Scanner input = new Scanner(skippedReader);
+            while(input.hasNextInt()) {
+                int completedSchoolID = input.nextInt();
+                if(school.getID() != completedSchoolID) {
+                    skippedWriter.write(String.valueOf(school.getID()));
+                }
+            }
+        } catch (IOException ex){
+            ex.printStackTrace();
+        }
+
+        if(!schoolsSkippedFile.delete()){
+            System.out.println("not deleted");
+        }
+        if(!tempFile.renameTo(schoolsSkippedFile)){
+            System.out.println("not replaced");
+        }
+    }
+
+    private boolean isInFile(School school, String fileName) {
+        java.io.File file = new java.io.File(fileName);
         try {
             Scanner input = new Scanner(file);
             while(input.hasNextInt()) {
-                int completedSchoolID = input.nextInt();
-                if(school.getID() == completedSchoolID) {
+                int schoolID = input.nextInt();
+                if(school.getID() == schoolID) {
                     return true;
                 }
             }
@@ -118,5 +160,20 @@ public abstract class CourseExtractor {
             ex.printStackTrace();
         }
         return false;
+    }
+
+    private void initializeFiles() {
+        try {
+            boolean skippedFileCreated = new File("schools_skipped.txt").createNewFile();
+            boolean completedFileCreated = new File("schools_completed.txt").createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void printTimeElapsed() {
+        long timeElapsed = System.currentTimeMillis()- startTime;
+        System.out.println("Time elapsed: " + timeElapsed/1000 + " seconds.");
+        startTime = System.currentTimeMillis();
     }
 }

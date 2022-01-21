@@ -34,6 +34,7 @@ public class CourseExtractorCourseleaf extends CourseExtractor{
                     Elements pageCourseBlocks = soup.getElementsByClass("courseblock");
                     pageCourseBlocks.forEach(courseBlock -> schoolCourseBlocks.add(courseBlock.toString()));
                 } catch (WebDriverException ex) {
+                    ex.printStackTrace();
 //                    logs.addMissedPage(subPageUrl);
 
                 }

@@ -10,6 +10,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class WebScraper {
     private static ChromeDriver driver;
@@ -52,10 +53,10 @@ public class WebScraper {
         return driver.findElements(By.xpath(xpath));
     }
 
-    public void scrollToMiddleOfWebElement(WebElement webElement) {
+    public void scrollToElement(WebElement webElement) {
         String scrollToMiddle = "var viewPortHeight = Math.max(document.documentElement.clientHeight, " +
                 "window.innerHeight || 0);var elementTop = arguments[0].getBoundingClientRect()." +
-                "top;window.scrollBy(0, elementTop-(4*viewPortHeight/5));";
+                "top;window.scrollBy(0, elementTop-(viewPortHeight/5));";
         driver.executeScript(scrollToMiddle, webElement);
     }
 
@@ -64,6 +65,8 @@ public class WebScraper {
     // Jsoup Methods
 
     public Document getSoup() {
+        String html = extractPageHtml();
+        soup = Jsoup.parse(html);
         return soup;
     }
 
@@ -124,4 +127,15 @@ public class WebScraper {
         }
         return table.select("tr");
     }
+
+    public static void pause(int pauseMilliseconds) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(pauseMilliseconds);
+        }
+        catch(InterruptedException ex) {
+            ex.printStackTrace();
+        }
+    }
 }
+
+

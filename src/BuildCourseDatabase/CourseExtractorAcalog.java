@@ -8,7 +8,6 @@ import org.jsoup.select.Elements;
 import org.openqa.selenium.*;
 
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class CourseExtractorAcalog extends CourseExtractor {
 
@@ -19,7 +18,7 @@ public class CourseExtractorAcalog extends CourseExtractor {
     @Override
     protected Set<String> extractCourseBlocksFromUrls(Set<String> candidateUrls){
         Set<String> schoolCourseBlocks = new HashSet<>();
-
+        int pageNumber = 1;
         for(String candidateUrl : candidateUrls) {
             Elements links = scrapeInDomainPageLinks(candidateUrl, currentDomain);
             String nextPageUrlStem = getNextPageUrlStem(links);
@@ -27,21 +26,24 @@ public class CourseExtractorAcalog extends CourseExtractor {
                 continue;       // Assumes there are AT LEAST 2 pages of courses
             }
 
-            Set<String> oldSiteCourseBlocks;
-            int pageNumber = 1;
+            String nextPageUrlEnd;
+            String html;
             do {
-                oldSiteCourseBlocks = new HashSet<>(schoolCourseBlocks);
                 openAllPreviewLinks();
-                Document soup = getSoupAfterPageLoads();
+                waitForPageToLoad();
+                html = scraper.extractPageHtml();
+                Document soup = Jsoup.parse(html);
                 Elements pageCourseBlocks = soup.getElementsByClass("coursepadding");
 
                 pageCourseBlocks.forEach(courseBlock -> schoolCourseBlocks.add(courseBlock.toString()));
-
                 pageNumber += 1;
-                String nextCourseDirectoryUrl = nextPageUrlStem + pageNumber + "#acalog_template_course_filter";
+                nextPageUrlEnd = pageNumber + "#acalog_template_course_filter";
+                String nextCourseDirectoryUrl = nextPageUrlStem + nextPageUrlEnd;
                 scraper.loadPage(nextCourseDirectoryUrl);
-            } while (!schoolCourseBlocks.equals(oldSiteCourseBlocks));
+            } while (html.contains(nextPageUrlEnd));
+
         }
+        clearIfCourseBlocksMissing(schoolCourseBlocks, pageNumber);
         return schoolCourseBlocks;
     }
 
@@ -59,38 +61,39 @@ public class CourseExtractorAcalog extends CourseExtractor {
 
     private void openAllPreviewLinks() {
         List<WebElement> previewLinks = getPreviewLinkWebElements();
-        for(int numberOfTries=1; numberOfTries<4; numberOfTries++){
+        for(int numberOfTries=1; numberOfTries<10; numberOfTries++){
+            // Open links starting at the bottom and moving up the page (so links don't move other links)
             for(int i=previewLinks.size()-1; i>=0; i--) {
                 WebElement previewLink = previewLinks.get(i);
                 try{
+                    scraper.scrollToElement(previewLink);
+                    WebScraper.pause(3);
                     previewLink.click();
                 } catch (ElementClickInterceptedException ex) {
-                    scraper.scrollToMiddleOfWebElement(previewLink);
+                    scraper.scrollToElement(previewLink);
                 } catch (ElementNotInteractableException | StaleElementReferenceException ex){
                     // Ignore for now (missing a few courseblocks is acceptable)
                 }
             }
+            waitForPageToLoad();
         }
     }
 
-    private Document getSoupAfterPageLoads() {
+    private void clearIfCourseBlocksMissing(Set<String> schoolCourseBlocks, int pageNumber) {
+        // Should be 100 courses per page (excluding the last page)
+        if(schoolCourseBlocks.size()/100 < pageNumber-2 || schoolCourseBlocks.size() <= 100){
+            schoolCourseBlocks.clear();
+        }
+    }
+
+    private void waitForPageToLoad() {
         String oldHtml;
         String html = scraper.extractPageHtml();
         do {
             oldHtml = html;
-            pause(300);
+            WebScraper.pause(300);
             html = scraper.extractPageHtml();
         } while (!html.equals(oldHtml));
-        return Jsoup.parse(html);
-    }
-
-    private void pause(int pauseMilliseconds) {
-        try {
-            TimeUnit.MILLISECONDS.sleep(pauseMilliseconds);
-        }
-        catch(InterruptedException ex) {
-            ex.printStackTrace();
-        }
     }
 
     private List<WebElement> getPreviewLinkWebElements() {
